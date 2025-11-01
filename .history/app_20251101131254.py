@@ -119,39 +119,46 @@ def delete_lista(lista_id):
 # ======================
 @app.route('/api/listas/<int:lista_id>/tarefas', methods=['GET'])
 def get_tarefas(lista_id):
-    print(f"DEBUG: Buscando tarefas da lista ID: {lista_id}")
+    print(f"DEBUG: Buscando tarefas da lista ID: {lista_id}")  # ← ADICIONAR
     
-    conn = get_db_connection()
-    if not conn:
-        return jsonify({'erro': 'Falha na conexão com o MySQL'}), 500
+    conn, err_resp, err_code = db()
+    if err_resp:
+        return err_resp, err_code
 
     try:
         cur = conn.cursor(dictionary=True)
 
         # Verifica se a lista existe
         cur.execute("SELECT 1 FROM listas WHERE id = %s", (lista_id,))
-        if not cur.fetchone():
+        resultado = cur.fetchone()
+        print(f"DEBUG: Lista encontrada? {resultado}")  # ← ADICIONAR
+        
+        if not resultado:
+            conn.close()
+            print(f"DEBUG: Lista {lista_id} NÃO EXISTE!")  # ← ADICIONAR
             return jsonify({'erro': 'Lista não encontrada'}), 404
 
         # Busca as tarefas
         cur.execute("""
-            SELECT id, texto, concluida, favoritada, criado_em
+            SELECT id, texto, concluida, favoritada
             FROM tarefas
             WHERE lista_id = %s
-            ORDER BY concluida ASC, criado_em DESC
+            ORDER BY concluida ASC, criada_em DESC
         """, (lista_id,))
         tarefas = cur.fetchall()
+        print(f"DEBUG: {len(tarefas)} tarefas encontradas")  # ← ADICIONAR
 
         ativas = [t for t in tarefas if not t['concluida']]
         concluidas = [t for t in tarefas if t['concluida']]
 
+        conn.close()
         return jsonify({'ativas': ativas, 'concluidas': concluidas})
 
     except Exception as e:
-        print(f"ERRO na rota get_tarefas: {e}")
+        print(f"ERRO na rota get_tarefas: {e}")  # ← JÁ EXISTE
+        if 'conn' in locals():
+            conn.close()
         return jsonify({'erro': 'Erro interno ao carregar tarefas'}), 500
-    finally:
-        conn.close()  # ← SEMPRE fecha no final
 
 
 @app.route('/api/tarefas', methods=['POST'])
@@ -228,7 +235,6 @@ def delete_tarefa(tarefa_id):
 # -------------------------------------------------
 # INICIAR SERVIDOR
 # -------------------------------------------------
-
 if __name__ == '__main__':
     seed_default_lists()  # Cria listas padrão na primeira execução
     print("Servidor rodando em http://localhost:5000")

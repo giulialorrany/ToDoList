@@ -1,0 +1,4 @@
+
+
+#COMO RODAR ?
+1-rodar app.py

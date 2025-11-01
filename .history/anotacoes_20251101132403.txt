@@ -1,0 +1,5 @@
+
+
+#COMO RODAR?
+1-python app.py no terminal
+

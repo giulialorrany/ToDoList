@@ -1,0 +1,18 @@
+
+
+
+1# Instalar dependência{
+-Python e pip:
+python --version
+pip --version
+
+-Flask e Mysql: 
+pip install Flask mysql-connector-python
+};
+
+2# MySQL instalado, rodando e criação do banco todolist;
+
+3# COMO RODAR?
+no terminal:
+python app.py
+

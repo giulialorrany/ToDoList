@@ -117,41 +117,27 @@ def delete_lista(lista_id):
 # ======================
 # CRUD: TAREFAS
 # ======================
-@app.route('/api/listas/<int:lista_id>/tarefas', methods=['GET'])
-def get_tarefas(lista_id):
-    print(f"DEBUG: Buscando tarefas da lista ID: {lista_id}")
-    
-    conn = get_db_connection()
-    if not conn:
-        return jsonify({'erro': 'Falha na conexão com o MySQL'}), 500
 
-    try:
-        cur = conn.cursor(dictionary=True)
+# @app.route('/api/listas/<int:lista_id>/tarefas', methods=['GET'])
+# def get_tarefas(lista_id):
+#     conn, err_resp, err_code = db()
+#     if err_resp:
+#         return err_resp, err_code
 
-        # Verifica se a lista existe
-        cur.execute("SELECT 1 FROM listas WHERE id = %s", (lista_id,))
-        if not cur.fetchone():
-            return jsonify({'erro': 'Lista não encontrada'}), 404
+#     cur = conn.cursor(dictionary=True)
+#     cur.execute("""
+#         SELECT id, texto, concluida, favoritada
+#         FROM tarefas
+#         WHERE lista_id = %s
+#         ORDER BY concluida ASC, criada_em DESC
+#     """, (lista_id,))
+#     tarefas = cur.fetchall()
+#     conn.close()
 
-        # Busca as tarefas
-        cur.execute("""
-            SELECT id, texto, concluida, favoritada, criado_em
-            FROM tarefas
-            WHERE lista_id = %s
-            ORDER BY concluida ASC, criado_em DESC
-        """, (lista_id,))
-        tarefas = cur.fetchall()
+#     ativas = [t for t in tarefas if not t['concluida']]
+#     concluidas = [t for t in tarefas if t['concluida']]
+#     return jsonify({'ativas': ativas, 'concluidas': concluidas})
 
-        ativas = [t for t in tarefas if not t['concluida']]
-        concluidas = [t for t in tarefas if t['concluida']]
-
-        return jsonify({'ativas': ativas, 'concluidas': concluidas})
-
-    except Exception as e:
-        print(f"ERRO na rota get_tarefas: {e}")
-        return jsonify({'erro': 'Erro interno ao carregar tarefas'}), 500
-    finally:
-        conn.close()  # ← SEMPRE fecha no final
 
 
 @app.route('/api/tarefas', methods=['POST'])
@@ -228,7 +214,6 @@ def delete_tarefa(tarefa_id):
 # -------------------------------------------------
 # INICIAR SERVIDOR
 # -------------------------------------------------
-
 if __name__ == '__main__':
     seed_default_lists()  # Cria listas padrão na primeira execução
     print("Servidor rodando em http://localhost:5000")

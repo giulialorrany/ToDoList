@@ -18,7 +18,7 @@
         }
 
         [data-theme="light"] {
-            --bg-primary: #787e8a3a;
+            --bg-primary: #f5f5f5;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --bg-card-hover: #e8e8e8;
@@ -80,7 +80,6 @@
             padding: 8px 24px 24px;
             background: var(--bg-secondary);
             transition: background 0.3s ease;
-            margin-bottom: 1vh;
         }
 
         .header h1 {
@@ -580,65 +579,23 @@
         .title-text:hover {
             cursor: pointer;
         }
-.edit-btn img {
-    width: 21px;
-    margin-top: 2px;
-    display: block;
-    transition: all 0.2s ease;
-}
 
-/* === MODO DARK (padrão) === */
-/* Lápis cinza, hover fica colorido */
-.list-item:hover .edit-btn img,
-.task-item:hover .edit-btn img,
-.edit-btn:hover img {
-    content: url('/static/img/lapisOncolor.png');
-}
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 1;
+            transition: all 0.2s ease;
+            padding: 4px;
+            border-radius: 4px;
+        }
 
-/* === MODO LIGHT === */
-/* Lápis já começa colorido */
-[data-theme="light"] .edit-btn img {
-    content: url('/static/img/lapisOncolor.png');
-}
-
-/* No hover, fica cinza */
-[data-theme="light"] .list-item:hover .edit-btn img,
-[data-theme="light"] .task-item:hover .edit-btn img,
-[data-theme="light"] .edit-btn:hover img {
-    content: url('/static/img/lapisOfcolor.png');
-}
-/* Quando passar o mouse NA LISTA INTEIRA, troca a imagem */
-.list-item:hover .edit-btn img {
-    content: url('/static/img/lapisOncolor.png');
-}
-
-/* Quando passar o mouse NA TAREFA INTEIRA, troca a imagem */
-.task-item:hover .edit-btn img {
-    content: url('/static/img/lapisOncolor.png');
-}
-
-/* Quando passar o mouse no botão, troca a imagem */
-.edit-btn:hover img {
-    content: url('/static/img/lapisOncolor.png');
-}
-     .edit-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    outline: none;
-}
-
-.edit-btn:hover {
-    background: none;
-}
-
-.edit-btn:focus {
-    outline: none;
-}
+     
+        .edit-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+        }
 
         .lapis {
             margin-bottom: -22px !important;
@@ -919,51 +876,26 @@
     }
 
     async function openList(id) {
-    console.log('DEBUG: Abrindo lista ID:', id);  // ← ADICIONAR
-    currentListId = id;
-    
-    const listItems = document.querySelectorAll('.list-item');
-    let nomeLista = 'Tarefas';
-    
-    listItems.forEach(item => {
-        if (item.onclick.toString().includes(`openList(${id})`)) {
-            const titleText = item.querySelector('.title-text');
-            if (titleText) {
-                nomeLista = titleText.textContent.trim();
+        currentListId = id;
+        
+        const listItems = document.querySelectorAll('.list-item');
+        let nomeLista = 'Tarefas';
+        
+        listItems.forEach(item => {
+            if (item.onclick.toString().includes(`openList(${id})`)) {
+                const titleText = item.querySelector('.title-text');
+                if (titleText) {
+                    nomeLista = titleText.textContent.trim();
+                }
             }
-        }
-    });
-    
-    console.log('DEBUG: Nome da lista:', nomeLista);  // ← ADICIONAR
-    document.getElementById('currentListName').textContent = nomeLista;
-    
-    document.getElementById('listsView').classList.remove('active');
-    document.getElementById('tasksView').classList.add('active');
-    
-    console.log('DEBUG: Chamando renderTarefas com currentListId:', currentListId);  // ← ADICIONAR
-    renderTarefas();
-}
-    // async function openList(id) {
-    //     currentListId = id;
+        });
         
-    //     const listItems = document.querySelectorAll('.list-item');
-    //     let nomeLista = 'Tarefas';
+        document.getElementById('currentListName').textContent = nomeLista;
         
-    //     listItems.forEach(item => {
-    //         if (item.onclick.toString().includes(`openList(${id})`)) {
-    //             const titleText = item.querySelector('.title-text');
-    //             if (titleText) {
-    //                 nomeLista = titleText.textContent.trim();
-    //             }
-    //         }
-    //     });
-        
-    //     document.getElementById('currentListName').textContent = nomeLista;
-        
-    //     document.getElementById('listsView').classList.remove('active');
-    //     document.getElementById('tasksView').classList.add('active');
-    //     renderTarefas();
-    // }
+        document.getElementById('listsView').classList.remove('active');
+        document.getElementById('tasksView').classList.add('active');
+        renderTarefas();
+    }
 
     function goBackToLists() {
         currentListId = null;

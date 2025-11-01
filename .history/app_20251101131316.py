@@ -228,7 +228,6 @@ def delete_tarefa(tarefa_id):
 # -------------------------------------------------
 # INICIAR SERVIDOR
 # -------------------------------------------------
-
 if __name__ == '__main__':
     seed_default_lists()  # Cria listas padrão na primeira execução
     print("Servidor rodando em http://localhost:5000")
