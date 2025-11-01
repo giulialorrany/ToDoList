@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a0d2e;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 8px;
+            background: #0d0520;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .header {
+            padding: 8px 24px 24px;
+            background: #0d0520;
+        }
+
+        .header h1 {
+            font-size: 40px;
+            font-weight: 400;
+            color: #8a7ba8;
+            letter-spacing: 0.5px;
+        }
+
+        .lists-view {
+            padding: 16px;
+        }
+
+        .list-item {
+            background: #2d1b4e;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .list-item:active {
+            background: #3d2b5e;
+        }
+
+        .list-icon {
+            font-size: 24px;
+            color: #00ff9d;
+        }
+
+        .list-content {
+            flex: 1;
+        }
+
+        .list-title {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .list-count {
+            color: #8a7ba8;
+            font-size: 13px;
+        }
+
+        .add-list-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: #1a0d2e;
+            border-top: 1px solid rgba(138, 123, 168, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .new-list-text {
+            color: #8a7ba8;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .new-list-text.hidden {
+            display: none;
+        }
+
+        .new-list-input {
+            display: none;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            border-bottom: 1px solid #555;
+        }
+
+
+        .new-list-input::placeholder {
+            color: #8a7ba8;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0 12px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 12px 8px;
+            color: #8a7ba8;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header .arrow {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .section-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+
+        .section-header .count {
+            margin-left: auto;
+        }
+
+        .task-item {
+            background: #2d1b4e;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .task-item:active {
+            background: #3d2b5e;
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid #8a7ba8;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: #7b68ee;
+            border-color: #7b68ee;
+        }
+
+        .task-item.completed .task-checkbox::after {
+            content: 'Checkmark';
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            color: #fff;
+            font-size: 16px;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-item.completed .task-title {
+            color: #8a7ba8;
+            text-decoration: line-through;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+
+        .star-btn.starred {
+            color: #00ff9d;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #7b68ee;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(123, 104, 238, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-state-icons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            font-size: 48px;
+        }
+
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state-icon:nth-child(1) { animation-delay: 0s; }
+        .empty-state-icon:nth-child(2) { animation-delay: 0.3s; }
+        .empty-state-icon:nth-child(3) { animation-delay: 0.6s; }
+        .empty-state-icon:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state-text {
+            color: #8a7ba8;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2d1b4e;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal.active { display: block; }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-input-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .modal-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid #8a7ba8;
+            border-radius: 50%;
+        }
+
+        .modal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .modal-input::placeholder {
+            color: #8a7ba8;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            border-top: 1px solid rgba(138, 123, 168, 0.2);
+            padding-top: 16px;
+        }
+
+        .modal-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .modal-action:active {
+            background: rgba(138, 123, 168, 0.1);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active { display: block; }
+
+        .section-tasks {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .section-tasks.collapsed {
+            max-height: 0;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- View de Listas -->
+    <div id="listsView" class="view active">
+        <div class="top-bar">
+            <button class="back-btn" style="visibility: hidden;">Back</button>
+            <button class="menu-btn">Menu</button>
+        </div>
+
+        <div class="header">
+            <h1>Tarefas</h1>
+        </div>
+
+        <div class="lists-view" id="listsContainer"></div>
+
+        <div class="add-list-container">
+            <span class="new-list-text" id="newListText">Nova lista</span>
+            <input type="text" id="newListInput" class="new-list-input" placeholder="Nome da lista">
+        </div>
+    </div>
+
+    <!-- View de Tarefas -->
+    <div id="tasksView" class="view">
+        <div class="top-bar">
+            <button class="back-btn" onclick="goBackToLists()">Back</button>
+            <button class="menu-btn">Menu</button>
+        </div>
+
+        <div class="header">
+            <h1 id="currentListName">Tarefas</h1>
+        </div>
+
+        <div id="taskContainer"></div>
+
+        <button class="fab" onclick="openModal()">Add</button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-input-group">
+                <div class="modal-checkbox"></div>
+                <input type="text" class="modal-input" id="modalInput" placeholder="Adicionar uma tarefa">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-action">
+                    <span class="modal-action-icon">Calendar</span>
+                    <span>Definir data de conclusão</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DADOS COM EMOJIS ====================
+        let lists = [
+            { id: 1, name: 'Meu Dia', icon: 'Sun', tasks: [], completedTasks: [] },
+            { id: 2, name: 'Importante', icon: 'Star', tasks: [], completedTasks: [] },
+            { id: 3, name: 'Planejado', icon: 'Calendar', tasks: [], completedTasks: [] }
+        ];
+        let currentListId = null;
+        let nextListId = 4;
+
+        // ==================== RENDER LISTAS COM EMOJIS ====================
+        function renderLists() {
+            const container = document.getElementById('listsContainer');
+            container.innerHTML = lists.map(list => {
+                const totalTasks = list.tasks.length + list.completedTasks.length;
+                return `
+                    <div class="list-item" onclick="openList(${list.id})">
+                        <div class="list-icon">${list.icon}</div>
+                        <div class="list-content">
+                            <div class="list-title">${list.name}</div>
+                            <div class="list-count">${totalTasks} tarefa${totalTasks !== 1 ? 's' : ''}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== NOVA LISTA – SEM DUPLICAÇÃO ====================
+        const newListText = document.getElementById('newListText');
+        const newListInput = document.getElementById('newListInput');
+        let creating = false;
+
+        newListText.addEventListener('click', () => {
+            newListInput.classList.add('active');
+            newListText.classList.add('hidden');
+            newListInput.focus();
+        });
+
+        newListInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !creating) {
+                e.preventDefault();
+                creating = true;
+                const name = newListInput.value.trim();
+                if (name) {
+                    lists.push({
+                        id: nextListId++,
+                        name: name,
+                        icon: 'House',
+                        tasks: [],
+                        completedTasks: []
+                    });
+                    newListInput.value = '';
+                    newListInput.classList.remove('active');
+                    newListText.classList.remove('hidden');
+                    renderLists();
+                }
+                creating = false;
+            }
+        });
+
+        newListInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (newListInput.value.trim() === '') {
+                    newListInput.classList.remove('active');
+                    newListText.classList.remove('hidden');
+                }
+            }, 150);
+        });
+
+        // ==================== CRUD BÁSICO ====================
+        function openList(listId) {
+            currentListId = listId;
+            const list = lists.find(l => l.id === listId);
+            document.getElementById('currentListName').textContent = list.name;
+            document.getElementById('listsView').classList.remove('active');
+            document.getElementById('tasksView').classList.add('active');
+            renderTasks();
+        }
+
+        function goBackToLists() {
+            currentListId = null;
+            document.getElementById('tasksView').classList.remove('active');
+            document.getElementById('listsView').classList.add('active');
+            renderLists();
+        }
+
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('modalInput').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('modalInput').value = '';
+        }
+
+        function addTask() {
+            const input = document.getElementById('modalInput');
+            const text = input.value.trim();
+            if (!text || !currentListId) return;
+
+            const list = lists.find(l => l.id === currentListId);
+            list.tasks.push({
+                id: Date.now(),
+                text: text,
+                completed: false,
+                starred: false
+            });
+            closeModal();
+            renderTasks();
+        }
+
+        function toggleTask(id) {
+            const list = lists.find(l => l.id === currentListId);
+            const task = list.tasks.find(t => t.id === id) || list.completedTasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                if (task.completed) {
+                    list.tasks = list.tasks.filter(t => t.id !== id);
+                    list.completedTasks.push(task);
+                } else {
+                    list.completedTasks = list.completedTasks.filter(t => t.id !== id);
+                    list.tasks.push(task);
+                }
+                renderTasks();
+            }
+        }
+
+        function toggleStar(id, event) {
+            event.stopPropagation();
+            const list = lists.find(l => l.id === currentListId);
+            const task = list.tasks.find(t => t.id === id) || list.completedTasks.find(t => t.id === id);
+            if (task) {
+                task.starred = !task.starred;
+                renderTasks();
+            }
+        }
+
+        function toggleSection(section) {
+            const tasksDiv = document.getElementById(section + 'Tasks');
+            const header = document.getElementById(section + 'Header');
+            if (tasksDiv && header) {
+                tasksDiv.classList.toggle('collapsed');
+                header.classList.toggle('collapsed');
+            }
+        }
+
+        function renderTasks() {
+            const list = lists.find(l => l.id === currentListId);
+            const container = document.getElementById('taskContainer');
+
+            if (!list || (list.tasks.length === 0 && list.completedTasks.length === 0)) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icons">
+                            <span class="empty-state-icon">Checkmark</span>
+                            <span class="empty-state-icon">Diamond</span>
+                            <span class="empty-state-icon">Sun</span>
+                            <span class="empty-state-icon">Star</span>
+                        </div>
+                        <div class="empty-state-text">
+                            As tarefas serão mostradas aqui se não<br>
+                            fizerem parte de listas criadas por você.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<ul class="task-list">';
+
+            if (list.tasks.length > 0) {
+                html += list.tasks.map(task => `
+                    <li class="task-item" onclick="toggleTask(${task.id})">
+                        <div class="task-checkbox"></div>
+                        <div class="task-content">
+                            <div class="task-title">${task.text}</div>
+                        </div>
+                        <button class="star-btn ${task.starred ? 'starred' : ''}" onclick="toggleStar(${task.id}, event)">
+                            ${task.starred ? 'Filled Star' : 'Empty Star'}
+                        </button>
+                    </li>
+                `).join('');
+            }
+
+            if (list.completedTasks.length > 0) {
+                html += `
+                    <div class="section-header" id="completedHeader" onclick="toggleSection('completed')">
+                        <span class="arrow">Down Arrow</span>
+                        <span>Concluída</span>
+                        <span class="count">${list.completedTasks.length}</span>
+                    </div>
+                    <div class="section-tasks" id="completedTasks">
+                        ${list.completedTasks.map(task => `
+                            <li class="task-item completed" onclick="toggleTask(${task.id})">
+                                <div class="task-checkbox"></div>
+                                <div class="task-content">
+                                    <div class="task-title">${task.text}</div>
+                                </div>
+                                <button class="star-btn ${task.starred ? 'starred' : ''}" onclick="toggleStar(${task.id}, event)">
+                                    ${task.starred ? 'Filled Star' : 'Empty Star'}
+                                </button>
+                            </li>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // ==================== EVENTOS MODAL ====================
+        document.getElementById('modalInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        // ==================== INICIAR ====================
+        renderLists();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a0d2e;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 8px;
+            background: #0d0520;
+        }
+
+        .back-btn, .menu-btn {
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .header {
+            padding: 8px 24px 24px;
+            background: #0d0520;
+        }
+
+        .header h1 {
+            font-size: 40px;
+            font-weight: 400;
+            color: #8a7ba8;
+            letter-spacing: 0.5px;
+        }
+
+        .lists-view {
+            padding: 16px;
+        }
+
+        .list-item {
+            background: #2d1b4e;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .list-item:active {
+            background: #3d2b5e;
+        }
+
+        .list-icon {
+            font-size: 24px;
+            color: #00ff9d;
+        }
+
+        .list-content {
+            flex: 1;
+        }
+
+        .list-title {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .list-count {
+            color: #8a7ba8;
+            font-size: 13px;
+        }
+
+        .add-list-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: #1a0d2e;
+            border-top: 1px solid rgba(138, 123, 168, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .add-list-btn {
+            background: none;
+            border: none;
+            color: #00ff9d;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .add-list-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            display: none;
+        }
+
+        .add-list-input.active {
+            display: block;
+        }
+
+        .add-list-input::placeholder {
+            color: #8a7ba8;
+        }
+
+        .new-list-text {
+            color: #8a7ba8;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .new-list-text.hidden {
+            display: none;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0 12px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 12px 8px;
+            color: #8a7ba8;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header .arrow {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .section-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+
+        .section-header .count {
+            margin-left: auto;
+        }
+
+        .task-item {
+            background: #2d1b4e;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .task-item:active {
+            background: #3d2b5e;
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid #8a7ba8;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: #7b68ee;
+            border-color: #7b68ee;
+        }
+
+        .task-item.completed .task-checkbox::after {
+            content: '✓';
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            color: #fff;
+            font-size: 16px;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-date {
+            color: #00ff9d;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .task-item.completed .task-title {
+            color: #8a7ba8;
+            text-decoration: line-through;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+
+        .star-btn.starred {
+            color: #00ff9d;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #7b68ee;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(123, 104, 238, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-state-icons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            font-size: 48px;
+        }
+
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state-icon:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .empty-state-icon:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .empty-state-icon:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        .empty-state-icon:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-state-text {
+            color: #8a7ba8;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2d1b4e;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-input-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .modal-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid #8a7ba8;
+            border-radius: 50%;
+        }
+
+        .modal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .modal-input::placeholder {
+            color: #8a7ba8;
+        }
+
+        .modal-date-input {
+            width: 100%;
+            background: #3d2b5e;
+            border: 1px solid #8a7ba8;
+            color: #fff;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+            display: none;
+        }
+
+        .modal-date-input.active {
+            display: block;
+        }
+
+        .modal-date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            border-top: 1px solid rgba(138, 123, 168, 0.2);
+            padding-top: 16px;
+        }
+
+        .modal-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #8a7ba8;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .modal-action:active {
+            background: rgba(138, 123, 168, 0.1);
+        }
+
+        .modal-action.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+        }
+
+        .modal-action-icon {
+            font-size: 20px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .section-tasks {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .section-tasks.collapsed {
+            max-height: 0;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .list-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.list-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.title-text {
+    flex: 1;
+    cursor: pointer;
+}
+
+
+.list-item:hover .edit-btn {
+    opacity: 1;
+}
+
+/* === EDIÇÃO INLINE (LISTAS E TAREFAS) === */
+.list-item, .task-item {
+    position: relative;
+}
+
+.list-title, .task-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.title-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: default;
+}
+
+.title-text:hover {
+    cursor: pointer;
+}
+
+
+/* Estilo para a imagem do lápis - SEMPRE VISÍVEL */
+.edit-btn {
+    background: none;
+    border: none;
+    color: #8a7ba8;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 1;  /* <- Sempre visível */
+    transition: all 0.2s ease;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.edit-btn img {
+    width: 21px;
+    margin-top: 2px;
+    /* height: 16px; */
+    display: block;
+}
+
+/* Quando passar o mouse NA LISTA INTEIRA, troca a imagem */
+.list-item:hover .edit-btn img {
+    content: url('/static/img/lapisOncolor.png');
+}
+
+/* Quando passar o mouse NA TAREFA INTEIRA, troca a imagem */
+.task-item:hover .edit-btn img {
+    content: url('/static/img/lapisOncolor.png');
+}
+
+/* Mantém o efeito de fundo no hover do botão */
+.edit-btn:hover {
+    background: rgba(0, 255, 157, 0.1);
+}
+/* Quando passar o mouse no botão, troca a imagem */
+.edit-btn:hover img {
+    content: url('/static/img/lapisOncolor.png');
+}
+.lapis{
+    width: 30px;
+    margin-top: 5px;
+}
+    </style>
+</head>
+<body>
+    <!-- View de Listas -->
+    <div id="listsView" class="view active">
+        <div class="top-bar">
+            <button class="back-btn" style="visibility: hidden;">←</button>
+            <button class="menu-btn">⋮</button>
+        </div>
+
+        <div class="header">
+            <h1>Tarefas</h1>
+        </div>
+
+        <div class="lists-view" id="listsContainer"></div>
+
+        <div class="add-list-container">
+            <button class="add-list-btn" onclick="toggleNewListInput()">+</button>
+            <span class="new-list-text" id="newListText" onclick="toggleNewListInput()">Nova lista</span>
+            <input type="text" class="add-list-input" id="newListInput" placeholder="Digite o nome da lista...">
+        </div>
+    </div>
+
+    <!-- View de Tarefas -->
+    <div id="tasksView" class="view">
+        <div class="top-bar">
+            <button class="back-btn" onclick="goBackToLists()">←</button>
+            <button class="menu-btn">⋮</button>
+        </div>
+
+        <div class="header">
+            <h1 id="currentListName">Tarefas</h1>
+        </div>
+
+        <div id="taskContainer"></div>
+
+        <button class="fab" onclick="openModal()">+</button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+   
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-input-group">
+                <div class="modal-checkbox"></div>
+                <input type="text" class="modal-input" id="modalInput" placeholder="Adicionar uma tarefa">
+            </div>
+            <input type="date" class="modal-date-input" id="modalDateInput">
+            <div class="modal-actions">
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function startEditListName(id, btn) {
+    event.stopPropagation(); // Impede abrir a lista
+
+    const titleText = btn.previousElementSibling;
+    const oldName = titleText.textContent.trim();
+    const input = document.createElement('input');
+    input.value = oldName;
+    input.style.cssText = 'background:transparent; border:none; color:#fff; font-size:16px; width:100%; outline:none; flex:1;';
+    
+    titleText.replaceWith(input);
+    input.focus();
+    input.select();
+
+    const save = async () => {
+        const novoNome = input.value.trim();
+        if (!novoNome || novoNome === oldName) {
+            input.replaceWith(titleText);
+            return;
+        }
+
+        try {
+            await api(`/api/listas/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ nome: novoNome })
+            });
+
+            const span = document.createElement('span');
+            span.textContent = novoNome;
+            span.className = 'title-text';
+            span.onclick = () => openList(id);
+            input.replaceWith(span);
+
+            if (currentListId == id) {
+                document.getElementById('currentListName').textContent = novoNome;
+            }
+        } catch (err) {
+            alert('Erro ao salvar nome');
+            input.replaceWith(titleText);
+        }
+    };
+
+    input.onblur = save;
+    input.onkeypress = e => { if (e.key === 'Enter') save(); };
+}
+
+        let currentListId = null;
+        let selectedDate = null;
+
+        const iconMap = {
+            'Meu Dia': '☀️',
+            'Importante': '⭐',
+            'Planejado': '📅'
+        };
+
+        async function api(url, options = {}) {
+            const response = await fetch(url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            if (!response.ok) throw new Error('Erro na API');
+            return response.json();
+        }
+
+        async function loadListas() {
+    try {
+        const listas = await api('/api/listas');
+        const container = document.getElementById('listsContainer');
+        container.innerHTML = listas.map(l => {
+            const icon = iconMap[l.nome] || '🏠';
+            return `
+                <div class="list-item" onclick="openList(${l.id})">
+                    <div class="list-icon">${icon}</div>
+                    <div class="list-content">
+                        <div class="list-title">
+                            <span class="title-text" onclick="openList(${l.id})">${l.nome}</span>
+                            <button class="edit-btn lapis" onclick="startEditListName(${l.id}, this)" title="Editar nome">
+                                <img src="/static/img/lapisOfcolor.png" alt="Editar">
+                            </button>
+                        </div>
+                        <div class="list-count">${l.total_tarefas} tarefa${l.total_tarefas !== 1 ? 's' : ''}</div>
+                    </div>
+                    <button class="menu-btn" onclick="showListMenu(${l.id}, event)">✕</button>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error('Erro ao carregar listas:', err);
+    }
+}
+
+        let creating = false;
+        function toggleNewListInput() {
+            const input = document.getElementById('newListInput');
+            const text = document.getElementById('newListText');
+            if (input.classList.contains('active')) {
+                input.classList.remove('active');
+                text.classList.remove('hidden');
+            } else {
+                input.classList.add('active');
+                text.classList.add('hidden');
+                input.focus();
+            }
+        }
+
+        async function addNewList() {
+            if (creating) return;
+            creating = true;
+            const input = document.getElementById('newListInput');
+            const nome = input.value.trim();
+            if (!nome) { creating = false; return; }
+
+            try {
+                await api('/api/listas', { 
+                    method: 'POST', 
+                    body: JSON.stringify({ nome }) 
+                });
+                input.value = '';
+                input.classList.remove('active');
+                document.getElementById('newListText').classList.remove('hidden');
+                loadListas();
+            } catch (err) {
+                alert('Erro ao criar lista');
+            }
+            creating = false;
+        }
+
+        document.getElementById('newListInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addNewList();
+        });
+
+        document.getElementById('newListInput').addEventListener('blur', () => {
+            setTimeout(() => {
+                const input = document.getElementById('newListInput');
+                if (input.value.trim() === '') {
+                    input.classList.remove('active');
+                    document.getElementById('newListText').classList.remove('hidden');
+                }
+            }, 200);
+        });
+
+ function editListName(id, el) {
+    const oldName = el.textContent.trim();
+    const input = document.createElement('input');
+    input.value = oldName;
+    input.style.cssText = 'background:transparent; border:none; color:#fff; font-size:16px; width:100%; outline:none;';
+    el.replaceWith(input);
+    input.focus();
+    input.select();
+
+    const save = async () => {
+        const novoNome = input.value.trim();
+        if (!novoNome || novoNome === oldName) {
+            input.replaceWith(el);
+            return;
+        }
+
+        try {
+            await api(`/api/listas/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ nome: novoNome })
+            });
+
+            // Atualiza só o título na tela
+            const span = document.createElement('span');
+            span.textContent = novoNome;
+            span.className = 'list-title';
+            span.ondblclick = () => editListName(id, span);
+            input.replaceWith(span);
+
+            // Atualiza o cabeçalho se for a lista atual
+            if (currentListId == id) {
+                document.getElementById('currentListName').textContent = novoNome;
+            }
+        } catch (err) {
+            alert('Erro ao salvar nome');
+            input.replaceWith(el);
+        }
+    };
+
+    input.onblur = save;
+    input.onkeypress = e => { if (e.key === 'Enter') save(); };
+}
+
+        function showListMenu(id, event) {
+            event.stopPropagation();
+            if (confirm('Excluir esta lista e todas as suas tarefas?')) {
+                api(`/api/listas/${id}`, { method: 'DELETE' })
+                    .then(() => {
+                        if (currentListId === id) goBackToLists();
+                        loadListas();
+                    })
+                    .catch(() => alert('Erro ao excluir'));
+            }
+        }
+
+        async function openList(id) {
+            currentListId = id;
+            const listas = await api('/api/listas');
+            const lista = listas.find(l => l.id === id);
+            document.getElementById('currentListName').textContent = lista.nome;
+            document.getElementById('listsView').classList.remove('active');
+            document.getElementById('tasksView').classList.add('active');
+            renderTarefas();
+        }
+
+        function goBackToLists() {
+            currentListId = null;
+            document.getElementById('tasksView').classList.remove('active');
+            document.getElementById('listsView').classList.add('active');
+            loadListas();
+        }
+
+        async function renderTarefas() {
+            if (!currentListId) return;
+            try {
+                const data = await api(`/api/listas/${currentListId}/tarefas`);
+                const container = document.getElementById('taskContainer');
+
+                if (data.ativas.length === 0 && data.concluidas.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icons">
+                                <span class="empty-state-icon">✓</span>
+                                <span class="empty-state-icon">✦</span>
+                                <span class="empty-state-icon">☀</span>
+                                <span class="empty-state-icon">★</span>
+                            </div>
+                            <div class="empty-state-text">
+                                As tarefas serão mostradas aqui se não<br>
+                                fizerem parte de listas criadas por você.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<ul class="task-list">';
+                data.ativas.forEach(t => { html += taskHTML(t, false); });
+
+                if (data.concluidas.length > 0) {
+                    html += `
+                        <div class="section-header" id="completedHeader" onclick="toggleSection('completed')">
+                            <span class="arrow">▼</span>
+                            <span>Concluída</span>
+                            <span class="count">${data.concluidas.length}</span>
+                        </div>
+                        <div class="section-tasks" id="completedTasks">`;
+                    data.concluidas.forEach(t => { html += taskHTML(t, true); });
+                    html += `</div>`;
+                }
+                html += '</ul>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Erro ao carregar tarefas:', err);
+            }
+        }
+
+       function taskHTML(t, concluida) {
+    return `
+        <li class="task-item ${concluida ? 'completed' : ''}" onclick="toggleConcluida(${t.id})">
+            <div class="task-checkbox"></div>
+            <div class="task-content">
+                <div class="task-title">
+                    <span class="title-text">${t.texto}</span>
+                    <button class="edit-btn" onclick="startEditTask(${t.id}, this)" title="Editar tarefa">
+                        <img src="/static/img/lapisOfcolor.png">    
+                    </button>
+                </div>
+            </div>
+            <button class="star-btn ${t.favoritada ? 'starred' : ''}" onclick="toggleFavorita(${t.id}, event)">
+                ${t.favoritada ? '★' : '☆'}
+            </button>
+            <button class="menu-btn" onclick="deleteTask(${t.id}, event)">x</button>
+        </li>`;
+}
+
+        function formatDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function toggleDateInput() {
+            const dateInput = document.getElementById('modalDateInput');
+            
+            if (dateInput.classList.contains('active')) {
+                dateInput.classList.remove('active');
+                selectedDate = null;
+            } else {
+                dateInput.classList.add('active');
+                dateInput.focus();
+            }
+        }
+
+        document.getElementById('modalDateInput').addEventListener('change', function() {
+            selectedDate = this.value;
+        });
+
+        async function addTarefa() {
+    const input = document.getElementById('modalInput');
+    const texto = input.value.trim();
+    if (!texto || !currentListId) return;
+
+    try {
+        await api('/api/tarefas', {
+            method: 'POST',
+            body: JSON.stringify({
+                lista_id: currentListId,
+                texto: texto
+            })
+        });
+        closeModal();
+        renderTarefas();
+    } catch (err) {
+        alert('Erro ao adicionar tarefa');
+        console.error(err);
+    }
+}
+
+        async function toggleConcluida(id) {
+            try {
+                const data = await api(`/api/listas/${currentListId}/tarefas`);
+                const tarefa = [...data.ativas, ...data.concluidas].find(t => t.id === id);
+                await api(`/api/tarefas/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ concluida: !tarefa.concluida })
+                });
+                renderTarefas();
+            } catch (err) {
+                alert('Erro ao marcar tarefa');
+            }
+        }
+
+        async function toggleFavorita(id, event) {
+            event.stopPropagation();
+            try {
+                const data = await api(`/api/listas/${currentListId}/tarefas`);
+                const tarefa = [...data.ativas, ...data.concluidas].find(t => t.id === id);
+                await api(`/api/tarefas/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ favoritada: !tarefa.favoritada })
+                });
+                renderTarefas();
+            } catch (err) {
+                alert('Erro ao favoritar');
+            }
+        }
+
+        async function deleteTask(id, event) {
+            event.stopPropagation();
+            if (confirm('Excluir esta tarefa?')) {
+                try {
+                    await api(`/api/tarefas/${id}`, { method: 'DELETE' });
+                    renderTarefas();
+                } catch (err) {
+                    alert('Erro ao excluir');
+                }
+            }
+        }
+
+        function editTaskText(id, el) {
+    const oldText = el.textContent.trim();
+    const input = document.createElement('input');
+    input.value = oldText;
+    input.style.cssText = 'background:transparent; border:none; color:#fff; font-size:16px; width:100%; outline:none;';
+    el.replaceWith(input);
+    input.focus();
+    input.select();
+
+    const save = async () => {
+        const novoTexto = input.value.trim();
+        if (!novoTexto || novoTexto === oldText) {
+            input.replaceWith(el);
+            return;
+        }
+
+        try {
+            await api(`/api/tarefas/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ texto: novoTexto })
+            });
+
+            // Atualiza só o texto na tela
+            const span = document.createElement('span');
+            span.textContent = novoTexto;
+            span.className = 'task-title';
+            span.ondblclick = () => editTaskText(id, span);
+            input.replaceWith(span);
+        } catch (err) {
+            alert('Erro ao salvar tarefa');
+            input.replaceWith(el);
+        }
+    };
+
+    input.onblur = save;
+    input.onkeypress = e => { if (e.key === 'Enter') save(); };
+}
+
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('modalInput').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('modalInput').value = '';
+            document.getElementById('modalDateInput').value = '';
+            document.getElementById('modalDateInput').classList.remove('active');
+            selectedDate = null;
+        }
+
+        function toggleSection(section) {
+            const tasksDiv = document.getElementById(section + 'Tasks');
+            const header = document.getElementById(section + 'Header');
+            if (tasksDiv && header) {
+                tasksDiv.classList.toggle('collapsed');
+                header.classList.toggle('collapsed');
+            }
+        }
+
+        document.getElementById('modalInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addTarefa();
+        });
+
+        loadListas();
+
+        function startEditTask(id, btn) {
+    event.stopPropagation(); // Impede toggle concluída
+
+    const titleText = btn.previousElementSibling;
+    const oldText = titleText.textContent.trim();
+    const input = document.createElement('input');
+    input.value = oldText;
+    input.style.cssText = 'background:transparent; border:none; color:#fff; font-size:16px; width:100%; outline:none; flex:1;';
+    
+    titleText.replaceWith(input);
+    input.focus();
+    input.select();
+
+    const save = async () => {
+        const novoTexto = input.value.trim();
+        if (!novoTexto || novoTexto === oldText) {
+            input.replaceWith(titleText);
+            return;
+        }
+
+        try {
+            await api(`/api/tarefas/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ texto: novoTexto })
+            });
+
+            const span = document.createElement('span');
+            span.textContent = novoTexto;
+            span.className = 'title-text';
+            input.replaceWith(span);
+        } catch (err) {
+            alert('Erro ao salvar tarefa');
+            input.replaceWith(titleText);
+        }
+    };
+
+    input.onblur = save;
+    input.onkeypress = e => { if (e.key === 'Enter') save(); };
+}
+    </script>
+</body>
+</html>
