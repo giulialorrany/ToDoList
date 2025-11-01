@@ -1,8 +1,4 @@
-TURMA:4º semestre, matutino-ADS A 
-PROGRAMADORES{
--Giulia Lorrany Canabarro Dos Santos
--Carlos Eduardo Costa Da Silva
-}
+P
 
 
 1# Instalar dependência{
@@ -13,7 +9,7 @@ pip --version
 
 -Flask e Mysql: 
 pip install Flask mysql-connector-python
-}
+};
 
 2# MySQL instalado, rodando e criação do banco todolist;
 

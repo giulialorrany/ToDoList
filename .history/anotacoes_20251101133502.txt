@@ -1,7 +1,5 @@
-TURMA:4º semestre, matutino-ADS A 
 PROGRAMADORES{
--Giulia Lorrany Canabarro Dos Santos
--Carlos Eduardo Costa Da Silva
+-Giulia Lorrany Canabarro Dos Santos-4º semestre matutino-ADS A 
 }
 
 
